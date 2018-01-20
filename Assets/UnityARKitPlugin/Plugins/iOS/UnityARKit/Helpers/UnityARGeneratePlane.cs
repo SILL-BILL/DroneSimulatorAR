@@ -6,20 +6,20 @@ namespace UnityEngine.XR.iOS
 	public class UnityARGeneratePlane : MonoBehaviour
 	{
 		public GameObject planePrefab;
-        private UnityARAnchorManager unityARAnchorManager;
+		protected UnityARAnchorManager unityARAnchorManager;
 
 		// Use this for initialization
-		void Start () {
+		protected virtual void Start () {
             unityARAnchorManager = new UnityARAnchorManager();
 			UnityARUtility.InitializePlanePrefab (planePrefab);
 		}
 
-        void OnDestroy()
+		protected virtual void OnDestroy()
         {
             unityARAnchorManager.Destroy ();
         }
 
-        void OnGUI()
+		protected virtual void OnGUI()
         {
             List<ARPlaneAnchorGameObject> arpags = unityARAnchorManager.GetCurrentPlaneAnchors ();
             if (arpags.Count >= 1) {

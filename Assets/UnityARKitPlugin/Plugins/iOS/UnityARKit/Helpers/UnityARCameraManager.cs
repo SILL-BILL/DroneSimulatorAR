@@ -6,8 +6,8 @@ using UnityEngine.XR.iOS;
 public class UnityARCameraManager : MonoBehaviour {
 
     public Camera m_camera;
-    private UnityARSessionNativeInterface m_session;
-	private Material savedClearMaterial;
+	protected UnityARSessionNativeInterface m_session;
+	protected Material savedClearMaterial;
 
 	[Header("AR Config Options")]
 	public UnityARAlignment startAlignment = UnityARAlignment.UnityARAlignmentGravity;
@@ -16,35 +16,27 @@ public class UnityARCameraManager : MonoBehaviour {
 	public bool enableLightEstimation = true;
 
 	// Use this for initialization
-	void Start () {
+	protected virtual void Start () {
 
 		m_session = UnityARSessionNativeInterface.GetARSessionNativeInterface();
 
-#if !UNITY_EDITOR
 		Application.targetFrameRate = 60;
         ARKitWorldTrackingSessionConfiguration config = new ARKitWorldTrackingSessionConfiguration();
 		config.planeDetection = planeDetection;
 		config.alignment = startAlignment;
 		config.getPointCloudData = getPointCloud;
 		config.enableLightEstimation = enableLightEstimation;
-        m_session.RunWithConfig(config);
+
+		if (config.IsSupported) {
+			m_session.RunWithConfig (config);
+		}
 
 		if (m_camera == null) {
 			m_camera = Camera.main;
 		}
-#else
-		//put some defaults so that it doesnt complain
-		UnityARCamera scamera = new UnityARCamera ();
-		scamera.worldTransform = new UnityARMatrix4x4 (new Vector4 (1, 0, 0, 0), new Vector4 (0, 1, 0, 0), new Vector4 (0, 0, 1, 0), new Vector4 (0, 0, 0, 1));
-		Matrix4x4 projMat = Matrix4x4.Perspective (60.0f, 1.33f, 0.1f, 30.0f);
-		scamera.projectionMatrix = new UnityARMatrix4x4 (projMat.GetColumn(0),projMat.GetColumn(1),projMat.GetColumn(2),projMat.GetColumn(3));
-
-		UnityARSessionNativeInterface.SetStaticCamera (scamera);
-
-#endif
 	}
 
-	public void SetCamera(Camera newCamera)
+	public virtual void SetCamera(Camera newCamera)
 	{
 		if (m_camera != null) {
 			UnityARVideo oldARVideo = m_camera.gameObject.GetComponent<UnityARVideo> ();
@@ -56,7 +48,7 @@ public class UnityARCameraManager : MonoBehaviour {
 		SetupNewCamera (newCamera);
 	}
 
-	private void SetupNewCamera(Camera newCamera)
+	protected virtual void SetupNewCamera(Camera newCamera)
 	{
 		m_camera = newCamera;
 
@@ -73,7 +65,7 @@ public class UnityARCameraManager : MonoBehaviour {
 
 	// Update is called once per frame
 
-	void Update () {
+	protected virtual void Update () {
 		
         if (m_camera != null)
         {
